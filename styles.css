@@ -168,7 +168,9 @@ button {
 
 .nav svg,
 .icon-button svg,
-.tiny-button svg {
+.tiny-button svg,
+.primary svg,
+.ghost svg {
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
@@ -401,10 +403,10 @@ h2 {
 .task {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  min-height: 86px;
-  padding: 16px 0;
+  grid-template-columns: minmax(0, 1fr) 82px;
+  gap: 14px;
+  min-height: 96px;
+  padding: 18px 0;
   border-bottom: 1px solid var(--line-2);
   background: #ffffff;
 }
@@ -472,32 +474,41 @@ h2 {
   margin: 0;
   color: var(--text-2);
   font-size: 16px;
-  line-height: 24px;
-  font-weight: 700;
+  line-height: 23px;
+  font-weight: 800;
+  word-break: keep-all;
 }
 
 .task small {
   display: block;
-  margin-top: 6px;
+  margin-top: 7px;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 19.5px;
+  font-size: 14px;
+  line-height: 21px;
+  word-break: keep-all;
 }
 
 .task-controls {
-  display: grid;
-  grid-template-columns: 42px 42px;
-  gap: 6px;
-  align-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  align-self: center;
 }
 
 .task-controls .primary,
 .task-controls .ghost {
-  width: 42px;
-  min-height: 42px;
+  width: 34px;
+  min-height: 34px;
   padding: 0;
   border-radius: 50%;
   font-size: 0;
+}
+
+.task-controls .primary svg,
+.task-controls .ghost svg {
+  width: 18px;
+  height: 18px;
 }
 
 .task-controls .primary {
@@ -509,7 +520,7 @@ h2 {
 }
 
 .task-controls .ghost {
-  background: var(--line-2);
+  background: transparent;
   color: var(--muted);
 }
 
@@ -553,9 +564,9 @@ h2 {
 
 .timeline-item {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  gap: 12px;
-  padding: 16px 0;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px 0;
   border-bottom: 1px solid var(--line-2);
   background: transparent;
 }
@@ -565,18 +576,28 @@ h2 {
 }
 
 .timeline-item strong {
+  display: grid;
+  gap: 2px;
   color: var(--text);
-  font-size: 15px;
-  line-height: 22.5px;
+  font-size: 17px;
+  line-height: 24px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.timeline-item strong small {
+  color: var(--muted-2);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 700;
 }
 
 .timeline-item p {
   margin: 0;
   color: var(--muted);
   font-size: 15px;
-  line-height: 22.5px;
+  line-height: 23px;
+  word-break: keep-all;
 }
 
 .subjects {

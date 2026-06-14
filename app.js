@@ -140,6 +140,15 @@ function koreanDate(value) {
   return `${date.getMonth() + 1}/${date.getDate()} (${dayName(value)})`;
 }
 
+function compactRange(start, end) {
+  const startDate = parseDate(start);
+  const endDate = parseDate(end);
+  return {
+    dates: `${startDate.getMonth() + 1}/${startDate.getDate()}~${endDate.getMonth() + 1}/${endDate.getDate()}`,
+    days: `${dayName(start)}-${dayName(end)}`,
+  };
+}
+
 function planWindow(date) {
   return PLAN_WINDOWS.find((item) => item.start <= date && date <= item.end) || PLAN_WINDOWS[PLAN_WINDOWS.length - 1];
 }
@@ -514,12 +523,15 @@ function renderDashboard() {
       <div class="section-head"><h3>시험 전 운영 구간</h3></div>
       <div class="timeline">
         ${PLAN_WINDOWS.map(
-          (item) => `
+          (item) => {
+            const range = compactRange(item.start, item.end);
+            return `
             <div class="timeline-item">
-              <strong>${koreanDate(item.start)}~${koreanDate(item.end)}</strong>
+              <strong><span>${range.dates}</span><small>${range.days}</small></strong>
               <p>암기과목: ${item.stage} · 수학: ${item.math}</p>
             </div>
-          `,
+          `;
+          },
         ).join("")}
       </div>
     </section>
