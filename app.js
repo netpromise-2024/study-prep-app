@@ -1,6 +1,6 @@
 const STUDENTS = [
-  { id: "hyeon1", name: "큰아들" },
-  { id: "hyeon2", name: "둘째아들" },
+  { id: "hyeon1", name: "옥승현" },
+  { id: "hyeon2", name: "옥수현" },
 ];
 
 const TODAY = "2026-06-14";
