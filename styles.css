@@ -147,6 +147,25 @@ button {
   margin-top: 18px;
 }
 
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  margin-top: 12px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--yellow-weak);
+  color: #b66a00;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 900;
+}
+
+.sync-pill.online {
+  background: var(--green-weak);
+  color: #028450;
+}
+
 .student-tabs button {
   min-height: 58px;
   display: grid;

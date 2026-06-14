@@ -1,6 +1,6 @@
 services:
   - type: web
     name: study-prep-app
-    env: static
+    env: node
     buildCommand: ""
-    staticPublishPath: .
+    startCommand: "node local-server.js"

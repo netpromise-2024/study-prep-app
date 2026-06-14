@@ -78,7 +78,10 @@ let state = {
   date: TODAY,
   editingTask: null,
   records: loadRecords(),
+  syncStatus: "syncing",
 };
+
+let saveTimer = null;
 
 function loadRecords() {
   try {
@@ -90,6 +93,69 @@ function loadRecords() {
 
 function saveRecords() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+  scheduleRemoteSave();
+}
+
+function mergeRecords(localRecords, remoteRecords) {
+  const merged = { ...remoteRecords };
+  for (const [key, localValue] of Object.entries(localRecords)) {
+    const remoteValue = remoteRecords[key];
+    if (!remoteValue) {
+      merged[key] = localValue;
+      continue;
+    }
+
+    const localTime = Date.parse(localValue.updatedAt || "") || 0;
+    const remoteTime = Date.parse(remoteValue.updatedAt || "") || 0;
+    merged[key] = localTime > remoteTime ? localValue : remoteValue;
+  }
+  return merged;
+}
+
+function recordsEqual(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+async function loadRemoteRecords() {
+  try {
+    const response = await fetch("/api/records", { cache: "no-store" });
+    if (!response.ok) throw new Error("Remote records unavailable");
+
+    const payload = await response.json();
+    const remoteRecords = payload.records && typeof payload.records === "object" ? payload.records : {};
+    const merged = mergeRecords(state.records, remoteRecords);
+    const changed = !recordsEqual(state.records, merged);
+    const needsUpload = !recordsEqual(remoteRecords, merged);
+
+    state.records = merged;
+    state.syncStatus = "online";
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+
+    if (changed) render();
+    if (needsUpload) persistRemoteRecords();
+  } catch {
+    state.syncStatus = "local";
+    render();
+  }
+}
+
+function scheduleRemoteSave() {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(persistRemoteRecords, 250);
+}
+
+async function persistRemoteRecords() {
+  try {
+    const response = await fetch("/api/records", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ records: state.records }),
+    });
+    if (!response.ok) throw new Error("Save failed");
+    state.syncStatus = "online";
+  } catch {
+    state.syncStatus = "local";
+  }
 }
 
 function icon(name) {
@@ -402,7 +468,7 @@ function renderShell(content) {
           <div class="brand-mark">S</div>
           <div>
             <h1>시험 준비 관리</h1>
-            <p>${studentName()} · ${state.selectedStudent}</p>
+            <p>${studentName()} · ${state.selectedStudent} · ${state.syncStatus === "online" ? "서버 저장" : "기기 저장"}</p>
           </div>
         </div>
         <div class="student-switch">
@@ -442,6 +508,9 @@ function topbar(title, helper, actions = "") {
         <p class="eyebrow">${studentName()} · ${state.selectedStudent}</p>
         <h2>${title}</h2>
         <small>${helper}</small>
+        <span class="sync-pill ${state.syncStatus === "online" ? "online" : ""}">
+          ${state.syncStatus === "online" ? "서버 동기화 중" : state.syncStatus === "syncing" ? "동기화 확인 중" : "기기 저장 모드"}
+        </span>
         ${renderStudentTabs()}
       </div>
       ${actions ? `<div class="actions">${actions}</div>` : ""}
@@ -703,3 +772,4 @@ window.saveEditor = saveEditor;
 window.resetDemoData = resetDemoData;
 
 render();
+loadRemoteRecords();

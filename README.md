@@ -24,11 +24,11 @@ node local-server.js
 ## Render 배포
 
 1. 이 폴더를 GitHub 저장소에 올립니다.
-2. Render에서 **New +** → **Static Site**를 선택합니다.
+2. Render에서 **New +** → **Web Service**를 선택합니다.
 3. GitHub 저장소를 연결합니다.
 4. 설정값:
    - Build Command: 비워두기
-   - Publish Directory: `.`
+   - Start Command: `node local-server.js`
 5. 배포 후 제공되는 Render URL로 접속합니다.
 
 ## GitHub 저장소 생성 순서
@@ -46,6 +46,7 @@ git push -u origin main
 
 ## 데이터 저장 방식
 
-현재 버전은 브라우저의 `localStorage`에 기록을 저장합니다. 같은 기기와 같은 브라우저에서는 기록이 유지됩니다.
+현재 버전은 Render 서버의 `/api/records`에 기록을 저장하고, 브라우저 `localStorage`는 보조 캐시로 사용합니다.
+같은 Render URL로 접속하는 PC와 휴대폰은 같은 공부 기록을 공유합니다.
 
-다음 버전에서는 부모 계정, 아이 계정, 서버 DB, 여러 기기 동기화를 추가할 수 있습니다.
+주의: Render 무료 Web Service의 파일 저장은 서버 재시작이나 재배포 때 유지가 보장되지 않을 수 있습니다. 장기 운영 버전에서는 Supabase 또는 PostgreSQL DB로 옮기는 것이 좋습니다.
