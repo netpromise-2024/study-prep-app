@@ -41,6 +41,14 @@ body {
   letter-spacing: 0;
 }
 
+svg {
+  width: 20px;
+  height: 20px;
+  max-width: 24px;
+  max-height: 24px;
+  flex: 0 0 auto;
+}
+
 button,
 input,
 textarea,
@@ -292,6 +300,14 @@ h2 {
 .primary {
   background: var(--blue);
   color: #ffffff;
+}
+
+.submit-button {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 16px;
+  font-size: 17px;
+  line-height: 25px;
 }
 
 .primary:active,

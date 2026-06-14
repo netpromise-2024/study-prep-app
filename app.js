@@ -631,7 +631,7 @@ function renderModal() {
             완료 처리
           </label>
           <div class="field full">
-            <button class="primary" type="submit">${icon("save")}저장</button>
+            <button class="primary submit-button" type="submit">저장</button>
           </div>
         </form>
       </section>
