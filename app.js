@@ -311,13 +311,14 @@ function closeEditor() {
 function saveEditor(event) {
   event.preventDefault();
   const form = new FormData(event.currentTarget);
+  const minutes = Math.max(0, Math.round(Number(form.get("minutes") || 0)));
   setRecord(state.editingTask.id, {
     date: state.date,
     subject: state.editingTask.subject,
     stage: state.editingTask.stage,
     content: state.editingTask.content,
     actual: form.get("actual").trim(),
-    minutes: Number(form.get("minutes") || 0),
+    minutes,
     memo: form.get("memo").trim(),
     done: form.get("done") === "on",
   });
@@ -612,7 +613,7 @@ function renderModal() {
           </div>
           <div class="field">
             <label>소요 시간</label>
-            <input name="minutes" type="number" min="0" step="5" value="${record.minutes || state.editingTask.targetMinutes}" />
+            <input name="minutes" type="number" min="0" step="1" inputmode="numeric" value="${record.minutes || state.editingTask.targetMinutes}" />
           </div>
           <div class="field full">
             <label>계획 내용</label>
