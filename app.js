@@ -267,6 +267,21 @@ function studentName(id = state.selectedStudent) {
   return STUDENTS.find((student) => student.id === id)?.name || id;
 }
 
+function renderStudentTabs(className = "student-tabs") {
+  return `
+    <div class="${className}" aria-label="아이 선택">
+      ${STUDENTS.map(
+        (student) => `
+          <button class="${student.id === state.selectedStudent ? "active" : ""}" type="button" onclick="login('${student.id}')">
+            <span>${student.name}</span>
+            <small>${student.id}</small>
+          </button>
+        `,
+      ).join("")}
+    </div>
+  `;
+}
+
 function login(studentId) {
   state.selectedStudent = studentId;
   localStorage.setItem("study-prep-student", studentId);
@@ -409,6 +424,7 @@ function topbar(title, helper, actions = "") {
         <p class="eyebrow">${studentName()} · ${state.selectedStudent}</p>
         <h2>${title}</h2>
         <small>${helper}</small>
+        ${renderStudentTabs()}
       </div>
       ${actions ? `<div class="actions">${actions}</div>` : ""}
     </header>
