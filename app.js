@@ -244,6 +244,23 @@ function tasksUntil(date) {
   return items;
 }
 
+function tasksBetween(start, end) {
+  const items = [];
+  for (let cursor = start; cursor <= end; cursor = addDays(cursor, 1)) {
+    items.push(...defaultTasks(cursor));
+  }
+  return items;
+}
+
+function completionForTasks(studentId, tasks) {
+  const done = tasks.filter((task) => state.records[taskRecordKey(studentId, task.id)]?.done).length;
+  return {
+    done,
+    total: tasks.length,
+    rate: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
+  };
+}
+
 function progressBySubject(studentId) {
   const records = state.records;
   return Object.keys(SUBJECTS).map((subject) => {
@@ -504,25 +521,32 @@ function renderDashboard() {
   const subjectProgress = progressBySubject(state.selectedStudent);
   const records = allStudentRecords(state.selectedStudent);
   const totalMinutes = records.reduce((sum, record) => sum + Number(record.minutes || 0), 0);
-  const doneCount = records.filter((record) => record.done).length;
-  const avg = subjectProgress.length
-    ? Math.round(subjectProgress.reduce((sum, item) => sum + item.rate, 0) / subjectProgress.length)
-    : 0;
+  const allTasks = tasksBetween(TODAY, "2026-07-08");
+  const overall = completionForTasks(state.selectedStudent, allTasks);
+  const weeklyProgress = PLAN_WINDOWS.map((item, index) => {
+    const range = compactRange(item.start, item.end);
+    const progress = completionForTasks(state.selectedStudent, tasksBetween(item.start, item.end));
+    const isCurrent = item.start <= state.date && state.date <= item.end;
+    return { ...item, ...range, ...progress, week: index + 1, isCurrent };
+  });
 
   renderShell(`
     ${topbar(
       "시험 대비 대시보드",
-      "과목별 진행률과 루틴 단계 완료 상태를 부모 관점에서 확인합니다.",
+      "전체 달성률과 주차별 달성률을 나눠서 확인합니다.",
       `<button class="ghost" type="button" onclick="showView('today')">${icon("home")}오늘 공부</button>`,
     )}
     <section class="grid stats">
-      <article class="card stat"><span>전체 진행률</span><strong>${avg}%</strong><small>과목별 평균</small></article>
-      <article class="card stat"><span>완료 기록</span><strong>${doneCount}개</strong><small>현재 브라우저 저장</small></article>
+      <article class="card stat primary-stat"><span>전체 달성률</span><strong>${overall.rate}%</strong><small>${overall.done}/${overall.total}개 완료</small></article>
+      <article class="card stat"><span>완료 기록</span><strong>${overall.done}개</strong><small>계획 대비 완료</small></article>
       <article class="card stat"><span>누적 공부 시간</span><strong>${totalMinutes}분</strong><small>입력된 시간 합계</small></article>
       <article class="card stat"><span>남은 시험</span><strong>5과목</strong><small>국어, 영어, 사회, 수학, 과학</small></article>
     </section>
     <section class="card section" style="margin-top:16px">
-      <div class="section-head"><h3>과목별 진행률</h3></div>
+      <div class="section-head">
+        <h3>전체 과목 달성률</h3>
+        <span class="status-pill ${overall.rate === 100 ? "done" : ""}">${overall.rate}%</span>
+      </div>
       <div class="progress-row">
         ${subjectProgress
           .map(
@@ -537,19 +561,28 @@ function renderDashboard() {
       </div>
     </section>
     <section class="card section" style="margin-top:16px">
-      <div class="section-head"><h3>시험 전 운영 구간</h3></div>
-      <div class="timeline">
-        ${PLAN_WINDOWS.map(
-          (item) => {
-            const range = compactRange(item.start, item.end);
-            return `
-            <div class="timeline-item">
-              <strong><span>${range.dates}</span><small>${range.days}</small></strong>
-              <p>암기과목: ${item.stage} · 수학: ${item.math}</p>
-            </div>
-          `;
-          },
-        ).join("")}
+      <div class="section-head"><h3>주차별 달성률</h3></div>
+      <div class="week-list">
+        ${weeklyProgress
+          .map(
+            (item) => `
+              <article class="week-item ${item.isCurrent ? "current" : ""}">
+                <div class="week-meta">
+                  <strong>${item.week}주차</strong>
+                  <span>${item.dates} · ${item.days}</span>
+                </div>
+                <div class="week-copy">
+                  <p>암기과목: ${item.stage} · 수학: ${item.math}</p>
+                  <div class="bar"><span style="width:${item.rate}%"></span></div>
+                </div>
+                <div class="week-score">
+                  <strong>${item.rate}%</strong>
+                  <span>${item.done}/${item.total}</span>
+                </div>
+              </article>
+            `,
+          )
+          .join("")}
       </div>
     </section>
   `);
