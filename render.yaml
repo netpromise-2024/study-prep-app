@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: study-prep-app
+    env: static
+    buildCommand: ""
+    staticPublishPath: .
