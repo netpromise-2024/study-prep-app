@@ -2,7 +2,7 @@ name: Family AI Learning OS CI
 
 on:
   push:
-    branches: [feature/family-ai-learning-os-mvp]
+    branches: [main, feature/family-ai-learning-os-mvp]
     paths:
       - "family-ai-learning-os/**"
       - ".github/workflows/family-ai-learning-os-ci.yml"
