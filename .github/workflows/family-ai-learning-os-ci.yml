@@ -1,0 +1,43 @@
+name: Family AI Learning OS CI
+
+on:
+  push:
+    branches: [feature/family-ai-learning-os-mvp]
+    paths:
+      - "family-ai-learning-os/**"
+      - ".github/workflows/family-ai-learning-os-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "family-ai-learning-os/**"
+      - ".github/workflows/family-ai-learning-os-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: family-ai-learning-os
+    env:
+      AUTH_SECRET: build-only-ci-not-a-real-secret-123456789
+      AUTH_GITHUB_ID: build-only
+      AUTH_GITHUB_SECRET: build-only
+      PARENT_GITHUB_ID: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: family-ai-learning-os/package.json
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
